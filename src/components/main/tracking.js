@@ -7,7 +7,9 @@ import {DeviceEventEmitter} from 'react-native';
 
 // var { RNLocation: Location } = require('NativeModules');
 import Location from 'react-native-gps';
+import firebase, {DB_NAMES} from '../../services/firebase';
 
+import moment from 'moment';
 
 import {styles} from '../../res/styles';
 
@@ -15,17 +17,16 @@ export default class TrackingContainer extends Component {
   constructor(props) {
     super(props);
 
-
-    // Location.startUpdatingLocation();
-
-  
     this.state = {
       latitude: null,
       longitude: null,
       error: null,
+      adventureKey: null
     };
     this.getLocation = this.getLocation.bind(this);
     this.nullLocation = this.nullLocation.bind(this);
+    this.startNewAdventure = this.startNewAdventure.bind(this);
+    this.continueAdventure = this.continueAdventure.bind(this);
   }
 
   componentDidMount() {
@@ -33,7 +34,6 @@ export default class TrackingContainer extends Component {
     DeviceEventEmitter.addListener(
       'locationUpdated',
       (location) => {
-        console.log(this, 'componenet');
         this.setState({latitude: location.latitude, longitude: location.longitude});
         /* Example location returned
         {
@@ -48,7 +48,6 @@ export default class TrackingContainer extends Component {
         */
       }
     );
-    console.log('setup listenere', this);
     Location.startUpdatingLocation();
 
   }
@@ -60,23 +59,74 @@ export default class TrackingContainer extends Component {
 
   getLocation() {
       Location.startUpdatingLocation();
+
+      if (this.state.adventureKey) {
+       this.continueAdventure(); 
+      } else {
+       this.startNewAdventure(); 
+      }
       setTimeout(function () {
         Location.stopUpdatingLocation();
       }, 1000);
     }
 
-    // Location.stopUpdatingLocation();
-    // navigator.geolocation.getCurrentPosition(
-    //   (position) => {
-    //     this.setState({
-    //       latitude: position.coords.latitude,
-    //       longitude: position.coords.longitude,
-    //       error: null,
-    //     });
-    //   },
-    //   (error) => this.setState({error: error.message}),
-    //   {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
-    // );
+  continueAdventure() {
+    console.log('adventure id found');
+    // fetch the current adventure
+    let currentAdventure = new Promise(
+      (resolve, reject) => {
+        firebase.database().ref(DB_NAMES.adventures + '/' + this.state.adventureKey).on('value', (snapshot) => {
+          resolve(snapshot.val());
+        })
+      }
+    );
+
+    const currentLocation = {latitude: this.state.latitude, longitude: this.state.longitude};
+    // update currentAdventure
+    currentAdventure.then((snapshot) => {
+      console.log(snapshot, 'snapshot');
+      const locations = [...snapshot.locations, currentLocation];
+
+      const updatedAdventure = {
+        ...snapshot,
+        locations
+      };
+
+      let updates = {};
+      updates[this.state.adventureKey] = updatedAdventure;
+      firebase.database().ref(DB_NAMES.adventures).update(updates);
+    });
+  }
+
+  startNewAdventure() {
+    console.log('no adventure found');
+    // get the new adventure key before pushing data to firebase
+    const newAdventureKey = firebase.database().ref(DB_NAMES.adventures).push().key;
+
+    // save key
+    this.setState({adventureKey: newAdventureKey});
+
+    const now = moment().format();
+    // create new object
+    const location = {latitude: this.state.latitude, longitude: this.state.longitude};
+
+    const newTrackingEvent = {
+      drink_count: 1,
+      start_time: now,
+      end_time: '',
+      total_time: '',
+      locations: [location],
+      completed: false
+    };
+
+    let updates = {};
+    updates[newAdventureKey] = newTrackingEvent;
+
+    // update firebase db
+    firebase.database().ref(DB_NAMES.adventures).update(updates);
+
+    console.log(newAdventureKey, 'newAdventruekey');
+  }
 
   nullLocation() {
     Location.stopUpdatingLocation();
@@ -90,7 +140,7 @@ export default class TrackingContainer extends Component {
     return (
       <Container style={styles.centerContent}>
         <Text style={[styles.textPrimary, {marginBottom: 20}]}>
-          Current Bar: 
+          Current Bar:
         </Text>
         <Text style={[styles.textPrimary, {marginBottom: 10}]}>
           Current location

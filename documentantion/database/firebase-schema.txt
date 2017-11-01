@@ -1,0 +1,22 @@
+
+adventures
+|____ adventure
+      |____ user_id
+      |____ drink_count
+      |____ spent_money
+      |____ start_time
+      |____ end_time
+      |____ total_time
+      |____ locations
+            |____ lat
+            |____ lon
+
+
+users
+|____ user
+      |____ user_id
+      |____ first_name
+      |____ last_name
+      |____ email
+      |____ password
+      

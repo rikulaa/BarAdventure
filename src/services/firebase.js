@@ -15,4 +15,9 @@ const firebaseConfig = {
   storageBucket: FIREBASE_STORAGE_BUCKET,
 };
 
+export const DB_NAMES = {
+  adventures: 'adventures',
+  users: 'users'
+};
+
 export default firebaseApp = firebase.initializeApp(firebaseConfig);

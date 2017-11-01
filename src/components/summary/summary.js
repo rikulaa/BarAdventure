@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Container from '../container';
 import {Text} from 'native-base';
 
-import firebase from '../../services/firebase';
+import firebase, {DB_NAMES} from '../../services/firebase';
 
 export default class Summary extends Component {
   constructor(props) {
@@ -14,7 +14,7 @@ export default class Summary extends Component {
     }
   }
   componentWillMount() {
-    const database = firebase.database().ref('/adventures').once('value').then((snapshot) => {
+    const database = firebase.database().ref(DB_NAMES.adventures).once('value').then((snapshot) => {
       console.log(snapshot.val(), 'advenures');
       this.setState({loading: false, adventures: snapshot.val()});
     });
