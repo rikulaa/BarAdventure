@@ -11,7 +11,7 @@ import moment from 'moment';
 
 import {styles} from '../../res/styles';
 
-export default class TrackingContainer extends Component {
+export default class Tracking extends Component {
   constructor(props) {
     super(props);
 
@@ -25,6 +25,7 @@ export default class TrackingContainer extends Component {
     this.nullLocation = this.nullLocation.bind(this);
     this.startNewAdventure = this.startNewAdventure.bind(this);
     this.continueAdventure = this.continueAdventure.bind(this);
+    this.endAdventure = this.endAdventure.bind(this);
   }
 
   componentDidMount() {
@@ -87,6 +88,7 @@ export default class TrackingContainer extends Component {
 
       const updatedAdventure = {
         ...snapshot,
+        drink_count: snapshot.drink_count + 1,
         locations
       };
 
@@ -126,6 +128,37 @@ export default class TrackingContainer extends Component {
     console.log(newAdventureKey, 'newAdventruekey');
   }
 
+  endAdventure() {
+    if (this.state.adventureKey) {
+      // fetch the current adventure
+      let currentAdventure = new Promise(
+        (resolve, reject) => {
+          firebase.database().ref(DB_NAMES.adventures + '/' + this.state.adventureKey).on('value', (snapshot) => {
+            resolve(snapshot.val());
+          })
+        }
+      );
+
+      const currentLocation = {latitude: this.state.latitude, longitude: this.state.longitude};
+      // update currentAdventure
+      currentAdventure.then((snapshot) => {
+        console.log(snapshot, 'snapshot');
+        const locations = [...snapshot.locations, currentLocation];
+
+        const updatedAdventure = {
+          ...snapshot,
+          locations,
+          completed: true
+        };
+
+        let updates = {};
+        updates[this.state.adventureKey] = updatedAdventure;
+        firebase.database().ref(DB_NAMES.adventures).update(updates);
+        this.setState({adventureKey: null})
+      });
+    }
+  }
+
   nullLocation() {
     Location.stopUpdatingLocation();
     this.setState({
@@ -153,8 +186,8 @@ export default class TrackingContainer extends Component {
           <Text>Drink!</Text>
         </Button>
 
-        <Button style={[styles.verticalMargin, styles.centerHorizontal]} onPress={this.nullLocation}>
-          <Text>Oops, mistake!</Text>
+        <Button style={[styles.verticalMargin, styles.centerHorizontal]} onPress={this.endAdventure}>
+          <Text>I'm done..</Text>
         </Button>
       </Container >
     );
