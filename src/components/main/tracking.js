@@ -2,12 +2,24 @@ import React, {Component} from 'react';
 import Container from '../container';
 import {Text, Button} from 'native-base';
 
+import {DeviceEventEmitter} from 'react-native';
+// var { DeviceEventEmitter } = React;
+
+// var { RNLocation: Location } = require('NativeModules');
+import Location from 'react-native-gps';
+
+
 import {styles} from '../../res/styles';
 
 export default class TrackingContainer extends Component {
   constructor(props) {
     super(props);
 
+    Location.requestWhenInUseAuthorization();
+
+    // Location.startUpdatingLocation();
+
+  
     this.state = {
       latitude: null,
       longitude: null,
@@ -17,18 +29,49 @@ export default class TrackingContainer extends Component {
     this.nullLocation = this.nullLocation.bind(this);
   }
 
-  getLocation() {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          error: null,
-        });
-      },
-      (error) => this.setState({error: error.message}),
-      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+  componentDidMount() {
+    var subscription = DeviceEventEmitter.addListener(
+      'locationUpdated',
+      (location) => {
+        console.log('location updated', location);
+        this.setState({latitude: location.latitude, longitude: location.longitude});
+        /* Example location returned
+        {
+          speed: -1,
+          longitude: -0.1337,
+          latitude: 51.50998,
+          accuracy: 5,
+          heading: -1,
+          altitude: 0,
+          altitudeAccuracy: -1
+        }
+        */
+      }
     );
+
+  }
+  componentWillUnmount() {
+    // Location.stopUpdatingLocation();
+    // DeviceEventEmitter.removeAllListeners();
+  }
+
+  getLocation() {
+    Location.startUpdatingLocation();
+    setTimeout(function() {
+      Location.stopUpdatingLocation();
+    }, 1000);
+    // Location.stopUpdatingLocation();
+    // navigator.geolocation.getCurrentPosition(
+    //   (position) => {
+    //     this.setState({
+    //       latitude: position.coords.latitude,
+    //       longitude: position.coords.longitude,
+    //       error: null,
+    //     });
+    //   },
+    //   (error) => this.setState({error: error.message}),
+    //   {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+    // );
   }
 
   nullLocation() {
