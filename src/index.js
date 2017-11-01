@@ -3,13 +3,15 @@ import React, { Component } from 'react';
 import {Root} from 'native-base';
 
 // navigator (routes)
-import {RootNavigator} from './navigators';
+import {LoggedInRoutes, LoggedOutRoutes} from './navigators';
 
 export default class App extends Component {
   render() {
+    const isLoggedIn = true;
     return (
       <Root>
-          <RootNavigator />
+          {isLoggedIn && <LoggedInRoutes />}
+          {!isLoggedIn && <LoggedOutRoutes />}
       </Root>
     );
   }

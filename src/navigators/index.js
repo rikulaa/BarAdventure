@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {Icon, Button} from 'native-base';
 import {DrawerNavigator, StackNavigator} from 'react-navigation';
 
+import LoginScreen from '../screens/login/login-screen';
+import RegisterScreen from '../screens/register/register-screen';
 import MainScreen from '../screens/main/main-screen';
 import SummaryScreen from '../screens/summary/summary-screen';
 import TestScreen from '../screens/test/test';
@@ -19,7 +21,7 @@ const contentOptions = {
 };
 
 
-export const RootNavigator = DrawerNavigator({
+export const LoggedInRoutes = DrawerNavigator({
     Main: {
       screen: MainScreen,
       navigationOptions: {
@@ -36,3 +38,12 @@ export const RootNavigator = DrawerNavigator({
   },
   contentOptions
 );
+
+export const LoggedOutRoutes = StackNavigator({
+  Login: {
+    screen: LoginScreen
+  },
+  Register: {
+    screen: RegisterScreen
+  }
+})
