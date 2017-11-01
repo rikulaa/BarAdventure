@@ -1,11 +1,11 @@
 ## Development 
 
-Install dependencies:
+Install dependencies:  
 **yarn install**
 
-Link native libraries:
+Link native libraries:  
 **react-native link**
 
-Start developing:
+Start developing:  
 **react-native run-ios** (android)
 **react-native run-android** (ios)
