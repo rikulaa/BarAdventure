@@ -15,7 +15,6 @@ export default class TrackingContainer extends Component {
   constructor(props) {
     super(props);
 
-    Location.requestWhenInUseAuthorization();
 
     // Location.startUpdatingLocation();
 
@@ -30,10 +29,11 @@ export default class TrackingContainer extends Component {
   }
 
   componentDidMount() {
-    var subscription = DeviceEventEmitter.addListener(
+    Location.requestWhenInUseAuthorization();
+    DeviceEventEmitter.addListener(
       'locationUpdated',
       (location) => {
-        console.log('location updated', location);
+        console.log(this, 'componenet');
         this.setState({latitude: location.latitude, longitude: location.longitude});
         /* Example location returned
         {
@@ -48,18 +48,23 @@ export default class TrackingContainer extends Component {
         */
       }
     );
+    console.log('setup listenere', this);
+    Location.startUpdatingLocation();
 
   }
   componentWillUnmount() {
-    // Location.stopUpdatingLocation();
+    console.log('will unmount ');
+    Location.stopUpdatingLocation();
     // DeviceEventEmitter.removeAllListeners();
   }
 
   getLocation() {
-    Location.startUpdatingLocation();
-    setTimeout(function() {
-      Location.stopUpdatingLocation();
-    }, 1000);
+      Location.startUpdatingLocation();
+      setTimeout(function () {
+        Location.stopUpdatingLocation();
+      }, 1000);
+    }
+
     // Location.stopUpdatingLocation();
     // navigator.geolocation.getCurrentPosition(
     //   (position) => {
@@ -72,9 +77,9 @@ export default class TrackingContainer extends Component {
     //   (error) => this.setState({error: error.message}),
     //   {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
     // );
-  }
 
   nullLocation() {
+    Location.stopUpdatingLocation();
     this.setState({
       latitude: null,
       longitude: null,
