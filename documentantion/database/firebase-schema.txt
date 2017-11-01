@@ -8,8 +8,8 @@ adventures
       |____ end_time
       |____ total_time
       |____ locations
-            |____ lat
-            |____ lon
+            |____ latitude
+            |____ longitude
 
 
 users
