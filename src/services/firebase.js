@@ -21,3 +21,4 @@ export const DB_NAMES = {
 };
 
 export default firebaseApp = firebase.initializeApp(firebaseConfig);
+export const adventures = firebaseApp.database().ref(DB_NAMES.adventures);

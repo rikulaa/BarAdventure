@@ -3,11 +3,9 @@ import Container from '../container';
 import {Text, Button} from 'native-base';
 
 import {DeviceEventEmitter} from 'react-native';
-// var { DeviceEventEmitter } = React;
 
-// var { RNLocation: Location } = require('NativeModules');
 import Location from 'react-native-gps';
-import firebase, {DB_NAMES} from '../../services/firebase';
+import firebase, {DB_NAMES, adventures} from '../../services/firebase';
 
 import moment from 'moment';
 
