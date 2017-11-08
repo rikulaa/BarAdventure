@@ -47,7 +47,7 @@ export default class Tracking extends Component {
       }
     );
 
-    const currentLocation = {latitude: this.state.latitude, longitude: this.state.longitude};
+    const currentLocation = {latitude: "21", longitude: "21"};
     // update currentAdventure
     currentAdventure.then((snapshot) => {
       console.log(snapshot, 'snapshot');
@@ -77,7 +77,7 @@ export default class Tracking extends Component {
 
     const now = moment().format();
     // create new object
-    const location = {latitude: this.state.latitude, longitude: this.state.longitude};
+    const location = {latitude: "21", longitude: "21"};
 
     const newTrackingEvent = {
       drink_count: 1,
@@ -110,7 +110,7 @@ export default class Tracking extends Component {
         }
       );
 
-      const currentLocation = {latitude: this.state.latitude, longitude: this.state.longitude};
+      const currentLocation = {latitude: "21", longitude: "21"};
       // update currentAdventure
       currentAdventure.then((snapshot) => {
         console.log(snapshot, 'snapshot');
