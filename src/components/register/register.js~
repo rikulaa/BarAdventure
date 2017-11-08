@@ -1,0 +1,57 @@
+import React, {Component} from 'react';
+import Container from '../container';
+import {Text, Content, Form, Item, Button, Input, Alert} from 'native-base';
+
+export default class Register extends Component {
+  constructor(props) {
+    super(props);
+    this.handleRegister = this.handleRegister.bind(this);
+
+    this.state = {
+      username: '',
+      password: '',
+      passwordConfirm: ''
+    }
+  }
+
+  handleRegister() {
+    console.log(this, 'refs');
+    const {username, password, passwordConfirm} = this.state;
+
+    if (!!username || !!password || !!passwordConfirm) {
+      alert('no values');
+    }
+
+    console.log(username, password, passwordConfirm);
+
+  }
+
+  render() {
+    console.log(this.state);
+    return (
+      <Container>
+        <Content>
+          <Form>
+            <Item>
+              <Input onChangeText={(username) => this.setState({username}) } ref="username" placeholder="Username" />
+            </Item>
+            <Item>
+              <Input onChangeText={(password) => this.setState({password}) } ref="password" placeholder="Password" />
+            </Item>
+
+            <Item last>
+              <Input onChangeText={(passwordConfirm) => this.setState({passwordConfirm})} ref="password_confirm" placeholder="Password confirm" />
+            </Item>
+            <Button onPress={this.handleRegister}>
+              <Text>
+                Register
+              </Text>
+            </Button>
+          </Form>
+
+        </Content>
+      </Container>
+    )
+  }
+
+}

@@ -1,0 +1,21 @@
+import React, {Component} from 'react'
+import {Button, Text, Header} from 'native-base';
+import Container from '../container.js';
+
+export default class Settings extends Component {
+	render() {
+    handleLogout() {
+
+    }
+		return(
+      <Container>
+        <Header>
+					<Text>Settings</Text>
+        </Header>
+				<Button>
+        	<Text>Logout</Text>
+        </Button>
+      </Container>
+    );
+  }
+}
