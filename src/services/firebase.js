@@ -5,7 +5,7 @@ import {
   FIREBASE_DATABASE_URL, 
   FIREBASE_PROJECT_ID, 
   FIREBASE_STORAGE_BUCKET
-} from '../../env';
+} from '../../env.js';
 
 // Initialize Firebase
 const firebaseConfig = {
