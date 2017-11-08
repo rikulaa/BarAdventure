@@ -4,7 +4,6 @@ import {Text, Button} from 'native-base';
 
 import {DeviceEventEmitter} from 'react-native';
 
-import Location from 'react-native-gps';
 import firebase, {DB_NAMES, adventures} from '../../services/firebase';
 
 import moment from 'moment';
@@ -28,45 +27,13 @@ export default class Tracking extends Component {
     this.endAdventure = this.endAdventure.bind(this);
   }
 
-  componentDidMount() {
-    Location.requestWhenInUseAuthorization();
-    DeviceEventEmitter.addListener(
-      'locationUpdated',
-      (location) => {
-        this.setState({latitude: location.latitude, longitude: location.longitude});
-        /* Example location returned
-        {
-          speed: -1,
-          longitude: -0.1337,
-          latitude: 51.50998,
-          accuracy: 5,
-          heading: -1,
-          altitude: 0,
-          altitudeAccuracy: -1
-        }
-        */
-      }
-    );
-    Location.startUpdatingLocation();
-
-  }
-  componentWillUnmount() {
-    console.log('will unmount ');
-    Location.stopUpdatingLocation();
-    // DeviceEventEmitter.removeAllListeners();
-  }
 
   getLocation() {
-      Location.startUpdatingLocation();
-
       if (this.state.adventureKey) {
-       this.continueAdventure(); 
+       this.continueAdventure();
       } else {
-       this.startNewAdventure(); 
+       this.startNewAdventure();
       }
-      setTimeout(function () {
-        Location.stopUpdatingLocation();
-      }, 1000);
     }
 
   continueAdventure() {
@@ -94,6 +61,8 @@ export default class Tracking extends Component {
 
       let updates = {};
       updates[this.state.adventureKey] = updatedAdventure;
+      this.setState({updates});
+
       firebase.database().ref(DB_NAMES.adventures).update(updates);
     });
   }
@@ -124,6 +93,8 @@ export default class Tracking extends Component {
 
     // update firebase db
     firebase.database().ref(DB_NAMES.adventures).update(updates);
+    this.setState({updates});
+
 
     console.log(newAdventureKey, 'newAdventruekey');
   }
@@ -153,6 +124,9 @@ export default class Tracking extends Component {
 
         let updates = {};
         updates[this.state.adventureKey] = updatedAdventure;
+
+        this.setState({updates});
+
         firebase.database().ref(DB_NAMES.adventures).update(updates);
         this.setState({adventureKey: null})
       });
@@ -160,7 +134,6 @@ export default class Tracking extends Component {
   }
 
   nullLocation() {
-    Location.stopUpdatingLocation();
     this.setState({
       latitude: null,
       longitude: null,
@@ -168,6 +141,7 @@ export default class Tracking extends Component {
     });
   }
   render() {
+    console.log(this.state, 'this.state');
     return (
       <Container style={styles.centerContent}>
         <Text style={[styles.textPrimary, {marginBottom: 20}]}>
