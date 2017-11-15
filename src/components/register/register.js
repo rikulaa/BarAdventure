@@ -1,36 +1,50 @@
 import React, {Component} from 'react';
-import Container from '../container';
-import {Text, Content, Form, Item, Button, Input, Alert, Spinner} from 'native-base';
+import {StyleSheet} from 'react-native';
+// import Container from '../container';
+import {Text, Container, Content, Form, Item, Button, Input, Alert, Spinner} from 'native-base';
 import firebase from '../../services/firebase';
+import {styles} from '../../res/styles';
 
 export default class Register extends Component {
   constructor(props) {
     super(props);
     this.handleRegister = this.handleRegister.bind(this);
+    this.validate = this.validate.bind(this);
 
     this.state = {
-      email: '',
-      password: '',
+      email: {
+        value: '',
+        touched: false
+      },
+      // email: '',
+      password: {
+        value: '',
+        touched: false
+      },
+      // password: '',
       passwordConfirm: '',
+      passwordConfirm: {
+        value: '',
+        touched: false
+      },
       isLoading: false
     }
   }
 
   handleRegister() {
-    console.log(this, 'refs');
     const {email, password, passwordConfirm} = this.state;
 
     // check that user has filled all fields
-    if (!email || !password || !passwordConfirm) {
+    if (!email.value || !password.value || !passwordConfirm.value) {
       alert('no values');
-    } else if (password !== passwordConfirm) {
+    } else if (password.value !== passwordConfirm.value) {
       alert("password don't match");
-    } else if (password.length < 6) {
+    } else if (password.value.length < 6) {
       alert('password length should be more than 6 characters');
     } else {
       // register user
       this.setState({isLoading: true});
-      firebase.auth().createUserWithEmailAndPassword(email, password).then(() => {
+      firebase.auth().createUserWithEmailAndPassword(email.value, password.value).then(() => {
         alert('Account created!');
         this.setState({isLoading: false});
         this.props.navigation.navigate('Login');
@@ -42,39 +56,61 @@ export default class Register extends Component {
       });
     }
 
+  }
 
-    console.log(email, password, passwordConfirm);
+  validate(value, type) {
+    switch (type) {
+      case 'email':
+      console.log(value.includes("@"));
+        return value.length > 0 && !value.includes("@");
 
+      case 'password':
+      case 'passwordConfirm':
+        return value.length < 6;
+    }
+
+    return true;
   }
 
   render() {
-    console.log(this.props);
+    const {email, password, passwordConfirm} = this.state;
+    const {validate} = this;
 
     return (
-      <Container>
-        <Content>
-          <Form>
-            <Item>
-              <Input onChangeText={(email) => this.setState({email}) } ref="email" placeholder="email" />
+      <Container style={[localStyles.container, styles.centerHorizontal]}>
+          <Form style={[localStyles.form]}>
+            <Item error={validate(email.value, 'email') && email.touched}>
+              <Input onChangeText={(email) => this.setState({email: {value: email, touched: true}}) } ref="email" placeholder="Email" />
             </Item>
-            <Item>
-              <Input onChangeText={(password) => this.setState({password}) } ref="password" placeholder="Password" />
+            <Item error={validate(password.value, 'password') < 6 && password.touched}>
+              <Input secureTextEntry onChangeText={(password) => this.setState({password: {value: password, touched: true}}) } ref="password" placeholder="Password" />
             </Item>
 
-            <Item last>
-              <Input onChangeText={(passwordConfirm) => this.setState({passwordConfirm})} ref="password_confirm" placeholder="Password confirm" />
+            <Item error={validate(passwordConfirm.value, 'password') && passwordConfirm.touched}>
+              <Input secureTextEntry onChangeText={(passwordConfirm) => this.setState({passwordConfirm: {value: passwordConfirm, touched: true}})} ref="password_confirm" placeholder="Password confirm" />
             </Item>
             {this.state.isLoading && <Spinner />}
-            {!this.state.isLoading &&<Button onPress={this.handleRegister}>
+            {!this.state.isLoading &&<Button style={[styles.centerHorizontal, localStyles.button]} onPress={this.handleRegister}>
                 <Text>
                   Register
                 </Text>
             </Button>}
           </Form>
-
-        </Content>
       </Container>
     )
   }
 
 }
+
+const localStyles = StyleSheet.create({
+  container: {
+    width: '80%'
+  },
+  button: {
+    marginTop: '10%',
+    alignSelf: 'center'
+  },
+  form: {
+    marginTop: '40%'
+  }
+})

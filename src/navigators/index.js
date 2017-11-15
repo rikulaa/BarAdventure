@@ -55,6 +55,9 @@ export const LoggedOutRoutes = StackNavigator({
     }
   },
   Register: {
-    screen: RegisterScreen
+    screen: RegisterScreen,
+    navigationOptions: {
+      title: 'Register'
+    }
   }
 })

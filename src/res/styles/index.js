@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {COLORS, MARGINS} from './constants'; 
+import {COLORS, MARGINS} from './constants';
 
 
 
@@ -39,6 +39,9 @@ const background = StyleSheet.create({
   },
   bgDanger: {
     backgroundColor: COLORS.warning
+  },
+  bgTransparent: {
+    backgroundColor: 'transparent'
   }
 })
 
