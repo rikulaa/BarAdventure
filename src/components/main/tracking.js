@@ -76,6 +76,7 @@ export default class Tracking extends Component {
     console.log('no adventure found');
     // get the new adventure key before pushing data to firebase
     const newAdventureKey = firebase.database().ref(DB_NAMES.adventures).push().key;
+    const {user} = this.state;
 
     // save key
     this.setState({adventureKey: newAdventureKey});
@@ -90,7 +91,8 @@ export default class Tracking extends Component {
       end_time: '',
       total_time: '',
       locations: [location],
-      completed: false
+      completed: false,
+      userUid: user.uid
     };
 
     let updates = {};
@@ -100,7 +102,6 @@ export default class Tracking extends Component {
     firebase.database().ref(DB_NAMES.adventures).update(updates);
 
     // add reference with user
-    const {user} = this.state;
     firebase.database().ref(DB_NAMES.users).child(user.uid).child('adventures').push({adventureId: newAdventureKey});
 
     this.setState({updates});

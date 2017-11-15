@@ -2,7 +2,7 @@
   "adventures": {
     "*adventureId*": [
       "completed": "boolean",
-      "*userId*": "string",
+      "*userUid*": "string",
       "drink_count": "integer",
       "start_time": "timestamp",
       "end_time": "timestamp",
@@ -23,7 +23,7 @@
       "photoUrl": "string",
       "uid": "string",
       "adventures": [
-        "*adventureId": {
+        "0": {
           "adventureId": "*adventureId*"
         },
         ...
