@@ -18,13 +18,18 @@ export default class Tracking extends Component {
       latitude: null,
       longitude: null,
       error: null,
-      adventureKey: null
+      adventureKey: null,
+      user: null
     };
     this.getLocation = this.getLocation.bind(this);
     this.nullLocation = this.nullLocation.bind(this);
     this.startNewAdventure = this.startNewAdventure.bind(this);
     this.continueAdventure = this.continueAdventure.bind(this);
     this.endAdventure = this.endAdventure.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({user: firebase.auth().currentUser});
   }
 
 
@@ -93,6 +98,11 @@ export default class Tracking extends Component {
 
     // update firebase db
     firebase.database().ref(DB_NAMES.adventures).update(updates);
+
+    // add reference with user
+    const {user} = this.state;
+    firebase.database().ref(DB_NAMES.users).child(user.uid).child('adventures').push({adventureId: newAdventureKey});
+
     this.setState({updates});
 
 

@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import {StyleSheet} from 'react-native';
 // import Container from '../container';
 import {Text, Container, Content, Form, Item, Button, Input, Alert, Spinner} from 'native-base';
-import firebase from '../../services/firebase';
+import firebase, {DB_NAMES} from '../../services/firebase';
 import {styles} from '../../res/styles';
+
 
 export default class Register extends Component {
   constructor(props) {
@@ -44,10 +45,21 @@ export default class Register extends Component {
     } else {
       // register user
       this.setState({isLoading: true});
-      firebase.auth().createUserWithEmailAndPassword(email.value, password.value).then(() => {
+      firebase.auth().createUserWithEmailAndPassword(email.value, password.value).then((response) => {
         alert('Account created!');
         this.setState({isLoading: false});
-        this.props.navigation.navigate('Login');
+
+        // get user data from response
+        const user = {
+          uid: response.uid,
+          name: response.displayName ? response.displayName : '',
+          email: response.email,
+          photoUrl: response.photoUrl ? response.photoUrl : '',
+          adventures: {}
+        }
+
+        // save user to userrs table
+        firebase.database().ref(DB_NAMES.users + '/' + user.uid).set(user);
 
       }).catch((error) => {
         console.warn(error);
@@ -65,6 +77,7 @@ export default class Register extends Component {
         return value.length > 0 && !value.includes("@");
 
       case 'password':
+        return value.length < 6;
       case 'passwordConfirm':
         return value.length < 6;
     }
