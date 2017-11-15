@@ -1,6 +1,6 @@
 
 adventures
-|____ adventure
+|____ *adventure_id*
       |____ user_id
       |____ drink_count
       |____ spent_money
@@ -13,13 +13,14 @@ adventures
 
 
 users
-|____ user
-      |____ user_id
-      |____ first_name
-      |____ last_name
+|____ *user_uid*
+      |____ uid
+      |____ displayName
       |____ email
       |____ password
       |____ latest_adventure
       |____ adventures
-            |____ adventure_id
-      
+            |____ *adventure_id*
+                |____ adventureId
+
+

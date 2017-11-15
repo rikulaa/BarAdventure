@@ -1,0 +1,32 @@
+{
+  "adventures": {
+    "*adventureId*": {
+      "completed": "boolean",
+      "drink_count": "integer",
+      "start_time": "timestamp",
+      "end_time": "timestamp",
+      "total_time": "int (duration in minutes)",
+      "locations": {
+        "0": {
+          "latitude": "float",
+          "longitude": "float"
+        },
+        ...
+    }
+  },
+
+  "users": {
+    "*userId*": {
+      "email": "string",
+      "name": "string",
+      "photoUrl": "string",
+      "uid": "string",
+      "adventures": {
+        "*adventureId": {
+          "adventureId": "*adventureId*"
+        },
+        ...
+      }
+    }
+  }
+}
