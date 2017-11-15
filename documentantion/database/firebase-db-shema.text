@@ -1,32 +1,33 @@
 {
   "adventures": {
-    "*adventureId*": {
+    "*adventureId*": [
       "completed": "boolean",
+      "*userId*": "string",
       "drink_count": "integer",
       "start_time": "timestamp",
       "end_time": "timestamp",
       "total_time": "int (duration in minutes)",
-      "locations": {
+      "locations": [
         "0": {
           "latitude": "float",
           "longitude": "float"
-        },
+        ],
         ...
-    }
+    ]
   },
 
-  "users": {
+  "users": [
     "*userId*": {
       "email": "string",
       "name": "string",
       "photoUrl": "string",
       "uid": "string",
-      "adventures": {
+      "adventures": [
         "*adventureId": {
           "adventureId": "*adventureId*"
         },
         ...
-      }
+      ]
     }
-  }
+  ]
 }
