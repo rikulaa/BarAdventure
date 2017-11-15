@@ -2,7 +2,7 @@
   "adventures": {
     "*adventureId*": [
       "completed": "boolean",
-      "*userUid*": "string",
+      "userUid": "string",
       "drink_count": "integer",
       "start_time": "timestamp",
       "end_time": "timestamp",
