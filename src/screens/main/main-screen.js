@@ -3,6 +3,7 @@ import {
   StyleSheet
 } from 'react-native';
 
+import {Container, Content} from 'native-base';
 import Tracking from '../../components/main/tracking';
 
 // const instructions = Platform.select({
@@ -16,7 +17,12 @@ import Tracking from '../../components/main/tracking';
 export default class HomeScreen extends Component {
   render() {
    return (
-     <Tracking />
+       <Container>
+        <Content>
+        <Tracking />
+        </Content>
+       </Container>
+     
    );
   }
 }

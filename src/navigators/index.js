@@ -6,6 +6,7 @@ import LoginScreen from '../screens/login/login-screen';
 import RegisterScreen from '../screens/register/register-screen';
 import MainScreen from '../screens/main/main-screen';
 import SummaryScreen from '../screens/summary/summary-screen';
+import SummaryDetailScreen from '../screens/summary/summary-detail-screen';
 import TestScreen from '../screens/test/test';
 import SettingsScreen from '../screens/settings/settings-screen';
 
@@ -21,6 +22,21 @@ const contentOptions = {
 
 };
 
+const SummaryRoutes = StackNavigator({
+  Summary: {
+    screen: SummaryScreen,
+    navigationOptions: {
+      title: 'Adventures'
+    }
+  },
+  SummaryDetail: {
+    screen: SummaryDetailScreen,
+    navigationOptions: {
+      title: 'Adventures'
+    }
+  }
+})
+
 
 export const LoggedInRoutes = DrawerNavigator({
     Main: {
@@ -31,7 +47,7 @@ export const LoggedInRoutes = DrawerNavigator({
       }
     },
     Summary: {
-      screen: SummaryScreen,
+      screen: SummaryRoutes,
       navigationOptions: {
         title: "What did I do??"
       }

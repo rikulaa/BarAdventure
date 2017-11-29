@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Summary from '../../components/summary/summary';
+import SummaryDetail from '../../components/summary/summary-detail';
 import {Container, Content} from 'native-base';
 
 export default class SummaryScreen extends Component {
@@ -7,7 +7,7 @@ export default class SummaryScreen extends Component {
     return (
          <Container>
         <Content>
-      <Summary navigation={this.props.navigation} />
+      <SummaryDetail navigation={this.props.navigation} />
         </Content>
         </Container>
     );

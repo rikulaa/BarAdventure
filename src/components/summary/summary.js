@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Container from '../container';
-import {Text} from 'native-base';
+import {View} from 'react-native';
+import {Text, List, ListItem, Left, Icon, Right, Body, Spinner} from 'native-base';
 
 import firebase, {DB_NAMES} from '../../services/firebase';
 
@@ -23,23 +24,34 @@ export default class Summary extends Component {
     
     
   render() {
-      console.log(this.state, "höhööööhöhöh");
+      console.log(this.props, 'pros');
       const testArray = Array.from(this.state.adventures)
-      console.log(testArray);
-      const allAdventures = Array.from(this.state.adventures).map((adventure, index) => {
+      const allAdventures = Object.keys(this.state.adventures).map((adventureID, index) => {
+          const adventure = this.state.adventures[adventureID];
           const start = adventure.start_time;
           console.log(adventure);
-          return <Text key={index}>{start}</Text>;
+          console.log("ID:", adventureID);
+            return <ListItem onPress={() => this.props.navigation.navigate('SummaryDetail', adventure)} key={adventureID} icon>
+              <Body>
+                <Text>{start}</Text>
+              </Body>
+              <Right>
+                <Icon name="arrow-forward" />
+              </Right>
+            </ListItem>;
+          
       });
     return (
-      <Container>
+      <View>
+        <List>
+            <ListItem itemHeader first>
+              <Text>COMEDY</Text>
+            </ListItem>
         {allAdventures}
-        {/*!!this.state.adventures && this.state.adventures.map((adventure) => {
-         return
-        })*/} 
-        {this.state.loading && <Text style={[{marginTop:50}]}>Im loading data from firebase</Text>}
-        {!this.state.loading && <Text style={[{marginTop: 20}]}>Summary with map and list. CHECK CONSOLE</Text>}
-      </Container>
+        </List>
+
+        {this.state.loading && <Spinner color='green' />}
+      </View>
     );
   }
 }
