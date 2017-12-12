@@ -3,6 +3,7 @@ import {Button, Text, Header, Spinner} from 'native-base';
 import Container from '../container.js';
 import {Alert} from 'react-native';
 import firebase from '../../services/firebase';
+import {styles} from '../../res/styles';
 
 export default class Settings extends Component {
   constructor(props) {
@@ -36,10 +37,10 @@ export default class Settings extends Component {
     return(
       <Container>
         <Header>
-          <Text>Settings</Text>
+          <Text style={[styles.verticalMargin, styles.centerHorizontal]}>Settings</Text>
         </Header>
         {isLoading && <Spinner />}
-        {!isLoading && <Button onPress={this.handleLogout.bind(this)}>
+        {!isLoading && <Button style={[styles.verticalMargin, styles.centerHorizontal, styles.textHeader]} onPress={this.handleLogout.bind(this)}>
           <Text>Logout</Text>
         </Button>}
       </Container>

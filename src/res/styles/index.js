@@ -71,7 +71,7 @@ const helpers = StyleSheet.create({
   },
   textCenter: {
     justifyContent: 'center'
-  }
+  }    
 });
 
 const layout = StyleSheet.create({

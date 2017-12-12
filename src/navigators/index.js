@@ -49,7 +49,7 @@ export const LoggedInRoutes = DrawerNavigator({
     Summary: {
       screen: SummaryRoutes,
       navigationOptions: {
-        title: "What did I do??"
+        title: "Drink Diary"
       }
     },
     Settings: {
