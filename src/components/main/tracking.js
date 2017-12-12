@@ -60,13 +60,15 @@ export default class Tracking extends Component {
     }
 
   continueAdventure() {
-    const getAdventure = getCurrentAdventureByKey(this.state.adventureKey);
+    // const getAdventure = getCurrentAdventureByKey(this.state.adventureKey);
     const getPosition = getCurrentPosition();
 
-    const promises = [getAdventure, getPosition];
-    Promise.all(promises).then(resolvedPromises => {
-      const currentAdventure = resolvedPromises[0];
-      const currentLocation = resolvedPromises[1];
+    // const promises = [getAdventure, getPosition];
+    // Promise.all(promises).then(resolvedPromises => {
+      getPosition.then((pos) => {
+      const currentAdventure = this.state.adventure;
+      // const currentLocation = resolvedPromises[1];
+      const currentLocation = pos;
       const locations = [...currentAdventure.locations, currentLocation];
 
       const updatedAdventure = {
