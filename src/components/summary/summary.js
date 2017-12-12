@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import moment from 'moment';
 import Container from '../container';
 import {View} from 'react-native';
 import {Text, List, ListItem, Left, Icon, Right, Body, Spinner} from 'native-base';
@@ -67,14 +68,15 @@ export default class Summary extends Component {
       console.log(this.props, 'pros');
       const {adventures} = this.state;
       const {navigate} = this.props.navigation;
+      const date = adventure => moment(adventure.start_time).format('MMMM Do YYYY'); // December 12th 2017
 
     return (
       <View>
-        <List onTouchEndCapture={(event) => this.handleScrollEnd(event)}>
+        <List style={{backgroundColor: '#fff'}} onTouchEndCapture={(event) => this.handleScrollEnd(event)}>
           {!!adventures && adventures.map((adventure, index) =>
             <ListItem onPress={() => navigate('SummaryDetail', adventure)} key={index} icon>
               <Body>
-                <Text>{adventure.start_time}</Text>
+                <Text>{date(adventure.start_time)}</Text>
               </Body>
               <Right>
                 <Icon name="arrow-forward" />

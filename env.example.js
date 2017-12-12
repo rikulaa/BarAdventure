@@ -5,3 +5,4 @@ export const FIREBASE_DATABASE_URL = ''
 export const FIREBASE_PROJECT_ID = ''
 export const FIREBASE_STORAGE_BUCKET = ''
 export const FIREBASE_MESSAGING_SENDER_ID = ''
+export const GOOGLE_STATIC_MAPS_API_KEY = '';

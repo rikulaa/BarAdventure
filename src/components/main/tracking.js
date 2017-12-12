@@ -136,7 +136,8 @@ export default class Tracking extends Component {
           ...currentAdventure,
           locations,
           completed: true,
-          end_time: now
+          end_time: now,
+          total_time
         };
 
         let updates = {};
