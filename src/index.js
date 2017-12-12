@@ -12,7 +12,8 @@ export default class App extends Component {
     super(props);
     this.state = {
       isLoggedIn: false,
-      isLoading: false
+      isLoading: false,
+      user: null
     };
 
   }
@@ -43,10 +44,11 @@ export default class App extends Component {
   render() {
     console.log(this.state, 'ROOT');
     const {isLoggedIn, isLoading} = this.state;
+    const {user} = this.state;
     return (
       <Root>
         {isLoading && <Spinner />}
-        {isLoggedIn && !isLoading && <LoggedInRoutes />}
+        {isLoggedIn && !isLoading && <LoggedInRoutes screenProps={{user}} />}
         {!isLoggedIn && !isLoading && <LoggedOutRoutes />}
       </Root>
     );

@@ -5,49 +5,81 @@ import {Text, List, ListItem, Left, Icon, Right, Body, Spinner} from 'native-bas
 
 import firebase, {DB_NAMES} from '../../services/firebase';
 
+const fetchAdventuresFromFirebase = (uid, limit) => {
+  return new Promise((resolve, reject) => {
+    firebase.database().ref(DB_NAMES.adventures)
+    .orderByChild("userUid")
+    .equalTo(uid)
+    .limitToLast(limit)
+    .once('value').then((snapshot) => {
+      const adventures = Object.keys(snapshot.val()).map((id, index) => {
+        return snapshot.val()[id];
+      }).reverse();
+
+      resolve(adventures);
+    });
+  });
+};
+
 export default class Summary extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       loading: true,
-      adventures: []
+      adventures: [],
+      currentLimit: 10
     }
+
+    this.loadMore = this.loadMore.bind(this);
+    this.fetchAdventures = this.fetchAdventures.bind(this);
+    this.handleScrollEnd = this.handleScrollEnd.bind(this);
   }
   componentWillMount() {
-    const database = firebase.database().ref(DB_NAMES.adventures).once('value').then((snapshot) => {
-      console.log(snapshot.val(), 'advenures');
-      this.setState({loading: false, adventures: snapshot.val()});
-    });
-    // console.log(database, 'firebase database');
+    this.fetchAdventures();
   }
-    
-    
+
+  fetchAdventures() {
+    this.setState({loading: true});
+    const {user} = this.props;
+    const {currentLimit} = this.state;
+    console.log(currentLimit, 'currentLimit');
+    const getAdventures = fetchAdventuresFromFirebase(user.uid, currentLimit);
+
+    getAdventures.then((adventures) => {
+      this.setState({loading: false, adventures});
+    })
+  }
+
+  loadMore() {
+    const previousLimit = this.state.currentLimit;
+    this.setState({currentLimit: previousLimit + 10});
+    this.fetchAdventures();
+    console.log('load more');
+  }
+
+  handleScrollEnd(event) {
+    console.log(event, 'event');
+  }
+
+
   render() {
       console.log(this.props, 'pros');
-      const testArray = Array.from(this.state.adventures)
-      const allAdventures = Object.keys(this.state.adventures).map((adventureID, index) => {
-          const adventure = this.state.adventures[adventureID];
-          const start = adventure.start_time;
-          console.log(adventure);
-          console.log("ID:", adventureID);
-            return <ListItem onPress={() => this.props.navigation.navigate('SummaryDetail', adventure)} key={adventureID} icon>
+      const {adventures} = this.state;
+      const {navigate} = this.props.navigation;
+
+    return (
+      <View>
+        <List onTouchEndCapture={(event) => this.handleScrollEnd(event)}>
+          {!!adventures && adventures.map((adventure, index) =>
+            <ListItem onPress={() => navigate('SummaryDetail', adventure)} key={index} icon>
               <Body>
-                <Text>{start}</Text>
+                <Text>{adventure.start_time}</Text>
               </Body>
               <Right>
                 <Icon name="arrow-forward" />
               </Right>
-            </ListItem>;
-          
-      });
-    return (
-      <View>
-        <List>
-            <ListItem itemHeader first>
-              <Text>COMEDY</Text>
-            </ListItem>
-        {allAdventures}
+            </ListItem>)}
         </List>
 
         {this.state.loading && <Spinner color='green' />}
