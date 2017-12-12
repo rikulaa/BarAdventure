@@ -75,7 +75,9 @@ export default class Tracking extends Component {
       this.setState({adventure: updatedAdventure});
 
       firebase.database().ref(DB_NAMES.adventures).update(updates);
-    });
+    }).catch(er => {
+      console.log(er)
+    })
   }
 
   startNewAdventure() {
@@ -94,6 +96,7 @@ export default class Tracking extends Component {
       const now = pos.timestamp;
 
       const newAdventure = {
+        id: newAdventureKey,
         drink_count: 1,
         start_time: now,
         end_time: '',
@@ -113,7 +116,9 @@ export default class Tracking extends Component {
       // add reference with user
       firebase.database().ref(DB_NAMES.users).child(user.uid).child('adventures').push({adventureId: newAdventureKey});
 
-    })
+    }).catch(er => {
+      console.log(er);
+    });
   }
 
   endAdventure() {
@@ -147,6 +152,8 @@ export default class Tracking extends Component {
 
         firebase.database().ref(DB_NAMES.adventures).update(updates);
         this.setState({adventureKey: null})
+      }).catch(er => {
+        console.log(er);
       })
     }
   }
