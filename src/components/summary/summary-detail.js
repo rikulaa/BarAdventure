@@ -75,7 +75,7 @@ export default class SummaryDetail extends Component {
         <View style={[styles.textContent]}>
           <Text style={[styles.text]}>Total drinks: {adventure.drink_count}</Text>
           <Text style={[styles.text]}>Duration of your adventure: {durations.days} days, {durations.hours} hours, {durations.minutes} minutes and {durations.seconds} seconds</Text>
-
+          <Image source={require('../../res/assets/images/drunk_owl.png')} style={{width: 200, height: 200}} />
           <Button onPress={() => this.handleDelete()} style={[styles.deleteButton]}>
             <Text>Forget plz..</Text>
           </Button>

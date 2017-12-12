@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import Container from '../container';
-import {Text, Button} from 'native-base';
+import {Text, Button, H1} from 'native-base';
 
 
-import {DeviceEventEmitter, Alert} from 'react-native';
+import {DeviceEventEmitter, Alert, Image} from 'react-native';
 
 import firebase, {DB_NAMES, adventures} from '../../services/firebase';
 
@@ -222,17 +222,20 @@ export default class Tracking extends Component {
 
     return (
       <Container style={styles.centerContent}>
+       <H1>Bar Adventure</H1>
+      <Image source={require('../../res/assets/images/owl.png')} style={{width: 300, height: 300}} />
+
         <Text style={[styles.textPrimary, {marginBottom: 20}]}>
           Current drink count: {!!adventure && adventure.drink_count}
         </Text>
       <Text style={[styles.textPrimary, {marginBottom: 50}]}>
-          Current location
+          Travelled distance:
         </Text>
 
         <Button style={[styles.verticalMargin, styles.centerHorizontal]} onPress={this.handleDrinkButtonClick}>
           <Text>Drink!</Text>
         </Button>
-        <Button style={[styles.verticalMargin, styles.centerHorizontal]} onPress={this.endAdventure}>
+         <Button danger style={[styles.verticalMargin, styles.centerHorizontal]} onPress={this.endAdventure}>
           <Text>I'm done..</Text>
         </Button>
       </Container >
