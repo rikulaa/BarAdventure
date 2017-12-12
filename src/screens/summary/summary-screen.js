@@ -5,11 +5,11 @@ import {Container, Content} from 'native-base';
 export default class SummaryScreen extends Component {
   render() {
     return (
-         <Container>
+      <Container>
         <Content>
-      <Summary navigation={this.props.navigation} />
+          <Summary user={this.props.screenProps.user} navigation={this.props.navigation} />
         </Content>
-        </Container>
+      </Container>
     );
   }
 }
