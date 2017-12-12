@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import Container from '../container';
 import {Text, Button} from 'native-base';
 
-import {DeviceEventEmitter} from 'react-native';
+
+import {DeviceEventEmitter, Alert} from 'react-native';
 
 import firebase, {DB_NAMES, adventures} from '../../services/firebase';
 
@@ -39,6 +40,8 @@ export default class Tracking extends Component {
     this.continueAdventure = this.continueAdventure.bind(this);
     this.endAdventure = this.endAdventure.bind(this);
     this.handleDrinkButtonClick = this.handleDrinkButtonClick.bind(this);
+    this.handleAlert = this.handleAlert.bind(this);
+    this.alertCheck = this.alertCheck.bind(this);
   }
 
   componentDidMount() {
@@ -49,6 +52,8 @@ export default class Tracking extends Component {
   handleDrinkButtonClick() {
       if (this.state.adventureKey) {
        this.continueAdventure();
+
+        this.alertCheck();
       } else {
        this.startNewAdventure();
       }
@@ -79,6 +84,57 @@ export default class Tracking extends Component {
       console.log(er)
     })
   }
+
+  alertCheck() {
+    const {adventure} = this.state;
+    const drinkCount = adventure.drink_count;
+    let alertOptions = {
+      title: "",
+      content: "",
+      successText: "",
+      successAction: null,
+      abortText: "",
+      abortAction: null,
+    };
+
+    switch (drinkCount) {
+      case 4:
+        alertOptions.title = "Time to call a taxi";
+        alertOptions.content = "Jyväskylä Local Taxi: 0100 6900";
+        alertOptions.successText = "Yes, please";
+        alertOptions.successAction = console.log("Yuub");
+        alertOptions.abortText = "I Was just StArting";
+        this.handleAlert(alertOptions);
+        break;
+      case 14:
+        alertOptions.title = "Your drink count is now 15";
+        alertOptions.content = "Was it worth it?";
+        alertOptions.successText = "Hell no!";
+        alertOptions.successAction = console.log("Yuub");
+        alertOptions.abortText = "YAAAAASSSS";
+        this.handleAlert(alertOptions);
+        break;
+      case 49:
+        alertOptions.title = "Your drink count is now 50";
+        alertOptions.content = "I think you need to go to hospital";
+        alertOptions.successText = "Y2es, please";
+        alertOptions.successAction = console.log("Yuub");
+        alertOptions.abortText = "It was an accident";
+        this.handleAlert(alertOptions);
+        break;
+        }
+
+  }
+
+    handleAlert(alertOptions) {
+    Alert.alert(
+      alertOptions.title,
+      alertOptions.content,
+   [
+        {text: alertOptions.successText, onPress: () => alertOptions.successAction},
+        {text: alertOptions.abortText, onPress: () => alertOptions.abortAction}
+]);
+}
 
   startNewAdventure() {
     console.log('no adventure found');
@@ -158,6 +214,8 @@ export default class Tracking extends Component {
     }
   }
 
+
+
   render() {
     console.log(this.state, 'this.state');
     const {adventure} = this.state;
@@ -167,19 +225,13 @@ export default class Tracking extends Component {
         <Text style={[styles.textPrimary, {marginBottom: 20}]}>
           Current drink count: {!!adventure && adventure.drink_count}
         </Text>
-        <Text style={[styles.textPrimary, {marginBottom: 10}]}>
+      <Text style={[styles.textPrimary, {marginBottom: 50}]}>
           Current location
         </Text>
-        <Text style={[styles.textPrimary]}>
-          Latitude: {this.state.latitude}
-        </Text>
-        <Text style={[styles.textPrimary, {marginBottom: 50}]}>
-          Longitude: {this.state.longitude}
-        </Text>
-        <Button style={[styles.buttonRounded, styles.verticalMargin, styles.centerHorizontal, {width: 200, height: 200}]} onPress={this.handleDrinkButtonClick}>
+
+        <Button style={[styles.verticalMargin, styles.centerHorizontal]} onPress={this.handleDrinkButtonClick}>
           <Text>Drink!</Text>
         </Button>
-
         <Button style={[styles.verticalMargin, styles.centerHorizontal]} onPress={this.endAdventure}>
           <Text>I'm done..</Text>
         </Button>
