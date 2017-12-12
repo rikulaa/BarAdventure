@@ -8,24 +8,37 @@ import firebase, {DB_NAMES, adventures} from '../../services/firebase';
 
 import moment from 'moment';
 
+import {getCurrentPosition} from '../../services/geolocation';
+
 import {styles} from '../../res/styles';
+
+const getCurrentAdventureByKey = (adventureKey) => {
+  return new Promise((resolve, reject) => {
+    firebase.database().ref(DB_NAMES.adventures + '/' + adventureKey).on('value', (snapshot) => {
+      resolve(snapshot.val());
+    })
+  })
+}
+
+const createNewAdventure = () => {
+    return firebase.database().ref(DB_NAMES.adventures).push().key;
+}
 
 export default class Tracking extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      latitude: null,
-      longitude: null,
       error: null,
       adventureKey: null,
+      adventure: null,
       user: null
     };
-    this.getLocation = this.getLocation.bind(this);
-    this.nullLocation = this.nullLocation.bind(this);
+
     this.startNewAdventure = this.startNewAdventure.bind(this);
     this.continueAdventure = this.continueAdventure.bind(this);
     this.endAdventure = this.endAdventure.bind(this);
+    this.handleDrinkButtonClick = this.handleDrinkButtonClick.bind(this);
   }
 
   componentDidMount() {
@@ -33,7 +46,7 @@ export default class Tracking extends Component {
   }
 
 
-  getLocation() {
+  handleDrinkButtonClick() {
       if (this.state.adventureKey) {
        this.continueAdventure();
       } else {
@@ -42,31 +55,24 @@ export default class Tracking extends Component {
     }
 
   continueAdventure() {
-    console.log('adventure id found');
-    // fetch the current adventure
-    let currentAdventure = new Promise(
-      (resolve, reject) => {
-        firebase.database().ref(DB_NAMES.adventures + '/' + this.state.adventureKey).on('value', (snapshot) => {
-          resolve(snapshot.val());
-        })
-      }
-    );
+    const getAdventure = getCurrentAdventureByKey(this.state.adventureKey);
+    const getPosition = getCurrentPosition();
 
-    const currentLocation = {latitude: "21", longitude: "21"};
-    // update currentAdventure
-    currentAdventure.then((snapshot) => {
-      console.log(snapshot, 'snapshot');
-      const locations = [...snapshot.locations, currentLocation];
+    const promises = [getAdventure, getPosition];
+    Promise.all(promises).then(resolvedPromises => {
+      const currentAdventure = resolvedPromises[0];
+      const currentLocation = resolvedPromises[1];
+      const locations = [...currentAdventure.locations, currentLocation];
 
       const updatedAdventure = {
-        ...snapshot,
-        drink_count: snapshot.drink_count + 1,
+        ...currentAdventure,
+        drink_count: currentAdventure.drink_count + 1,
         locations
       };
 
       let updates = {};
       updates[this.state.adventureKey] = updatedAdventure;
-      this.setState({updates});
+      this.setState({adventure: updatedAdventure});
 
       firebase.database().ref(DB_NAMES.adventures).update(updates);
     });
@@ -75,88 +81,83 @@ export default class Tracking extends Component {
   startNewAdventure() {
     console.log('no adventure found');
     // get the new adventure key before pushing data to firebase
-    const newAdventureKey = firebase.database().ref(DB_NAMES.adventures).push().key;
+    const newAdventureKey = createNewAdventure();
     const {user} = this.state;
 
     // save key
     this.setState({adventureKey: newAdventureKey});
 
-    const now = moment().format();
     // create new object
-    const location = {latitude: "21", longitude: "21"};
+    const getPosition = getCurrentPosition();
+    getPosition.then((pos) => {
+      const location = pos;
+      const now = pos.timestamp;
 
-    const newTrackingEvent = {
-      drink_count: 1,
-      start_time: now,
-      end_time: '',
-      total_time: '',
-      locations: [location],
-      completed: false,
-      userUid: user.uid
-    };
+      const newAdventure = {
+        drink_count: 1,
+        start_time: now,
+        end_time: '',
+        total_time: '',
+        locations: [location],
+        completed: false,
+        userUid: user.uid
+      };
 
-    let updates = {};
-    updates[newAdventureKey] = newTrackingEvent;
+      let updates = {};
+      updates[newAdventureKey] = newAdventure;
+      this.setState({adventure: newAdventure});
 
-    // update firebase db
-    firebase.database().ref(DB_NAMES.adventures).update(updates);
+      // update firebase db
+      firebase.database().ref(DB_NAMES.adventures).update(updates);
 
-    // add reference with user
-    firebase.database().ref(DB_NAMES.users).child(user.uid).child('adventures').push({adventureId: newAdventureKey});
+      // add reference with user
+      firebase.database().ref(DB_NAMES.users).child(user.uid).child('adventures').push({adventureId: newAdventureKey});
 
-    this.setState({updates});
-
-
-    console.log(newAdventureKey, 'newAdventruekey');
+    })
   }
 
   endAdventure() {
     if (this.state.adventureKey) {
       // fetch the current adventure
-      let currentAdventure = new Promise(
-        (resolve, reject) => {
-          firebase.database().ref(DB_NAMES.adventures + '/' + this.state.adventureKey).on('value', (snapshot) => {
-            resolve(snapshot.val());
-          })
-        }
-      );
+      const getAdventure = getCurrentAdventureByKey(this.state.adventureKey);
+      const getPosition = getCurrentPosition();
 
-      const currentLocation = {latitude: "21", longitude: "21"};
-      // update currentAdventure
-      currentAdventure.then((snapshot) => {
-        console.log(snapshot, 'snapshot');
-        const locations = [...snapshot.locations, currentLocation];
+      Promise.all([getAdventure, getPosition]).then(resolvedPromises => {
+        const currentAdventure = resolvedPromises[0];
+        const currentLocation = resolvedPromises[1];
+        // update currentAdventure
+        const locations = [...currentAdventure.locations, currentLocation];
+        const now = currentLocation.timestamp;
+        const start = locations[0].timestamp;
+        const total_time = start - now;
+
 
         const updatedAdventure = {
-          ...snapshot,
+          ...currentAdventure,
           locations,
-          completed: true
+          completed: true,
+          end_time: now
         };
 
         let updates = {};
         updates[this.state.adventureKey] = updatedAdventure;
 
-        this.setState({updates});
+        this.setState({adventure: null});
 
         firebase.database().ref(DB_NAMES.adventures).update(updates);
         this.setState({adventureKey: null})
-      });
+      })
     }
   }
 
-  nullLocation() {
-    this.setState({
-      latitude: null,
-      longitude: null,
-      error: null,
-    });
-  }
   render() {
     console.log(this.state, 'this.state');
+    const {adventure} = this.state;
+
     return (
       <Container style={styles.centerContent}>
         <Text style={[styles.textPrimary, {marginBottom: 20}]}>
-          Current Bar:
+          Current drink count: {!!adventure && adventure.drink_count}
         </Text>
         <Text style={[styles.textPrimary, {marginBottom: 10}]}>
           Current location
@@ -167,7 +168,7 @@ export default class Tracking extends Component {
         <Text style={[styles.textPrimary, {marginBottom: 50}]}>
           Longitude: {this.state.longitude}
         </Text>
-        <Button style={[styles.buttonRounded, styles.verticalMargin, styles.centerHorizontal, {width: 200, height: 200}]} onPress={this.getLocation}>
+        <Button style={[styles.buttonRounded, styles.verticalMargin, styles.centerHorizontal, {width: 200, height: 200}]} onPress={this.handleDrinkButtonClick}>
           <Text>Drink!</Text>
         </Button>
 
