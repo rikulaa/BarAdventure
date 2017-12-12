@@ -9,6 +9,7 @@ import {GOOGLE_STATIC_MAPS_API_KEY} from '../../../env';
 import {styles as globalStyles} from '../../res/styles';
 
 import {getDurationBetweenDates} from '../../helpers/time';
+import {getDistanceInKmBetweenCoordinates} from '../../helpers/location';
 import firebase, {DB_NAMES} from '../../services/firebase';
 
 // const GOOGLE_MAPS_PREFIX = 'https://maps.googleapis.com/maps/api/staticmap?center=40.714%2c%20-73.998&zoom=12&size=800x800&key=';
@@ -76,16 +77,24 @@ export default class SummaryDetail extends Component {
       </View>
     );
 
-    const totalTime = adventure.start_time - adventure.end_time;
-    console.log(adventure.end_time - adventure.start_time, 'start and end');
+    let travelledDistance = 0;
+    adventure.locations.map((location, index) => {
+      const previousValue = adventure.locations[index - 1];
+      const currentValue = location;
+      const distanceBetweenPrevious = getDistanceInKmBetweenCoordinates(previousValue, currentValue);
+      travelledDistance = travelledDistance + distanceBetweenPrevious;
+    })
+
     const durations = getDurationBetweenDates(adventure.end_time, adventure.start_time);
-    console.log(totalTime, 'totalTime', durations);
+    console.log(adventure, 'adventure');
+
     return (
       <View style={[{flex: 1}]}>
         <Image resizeMode='cover' style={{width: '100%', height: 300}} source={{uri: mapUrl}} />
         <View style={[styles.textContent]}>
           <Text style={[styles.text]}>Total drinks: {adventure.drink_count}</Text>
-          <Text style={[styles.text]}>Duration of your adventure: {durations.days} days, {durations.hours} hours, {durations.minutes} minutes and {durations.seconds} seconds</Text>
+          <Text style={[styles.text]}>Duration: {durations.days} days, {durations.hours} hours, {durations.minutes} minutes and {durations.seconds} seconds</Text>
+          <Text style={[styles.text]}>Distance travelled: {travelledDistance.toFixed(2)} km</Text>
 
           <Button onPress={() => this.handleDelete()} style={[styles.deleteButton, globalStyles.centerVertical, globalStyles.centerHorizontal]}>
             <Text>Forget plz..</Text>
