@@ -77,6 +77,8 @@ export default class SummaryDetail extends Component {
       </View>
     );
 
+    const isCompleted = !!adventure && adventure.completed;
+
     let travelledDistance = 0;
     adventure.locations.map((location, index) => {
       const previousValue = adventure.locations[index - 1];
@@ -92,10 +94,14 @@ export default class SummaryDetail extends Component {
       <View style={[{flex: 1}]}>
         <Image resizeMode='cover' style={{width: '100%', height: 300}} source={{uri: mapUrl}} />
         <View style={[styles.textContent]}>
+          {!isCompleted && <Text style={[styles.text, globalStyles.textInfo]}>Hey! This adventure is uncompleted!</Text>}
+          {isCompleted && <View>
+          </View>}
+
           <Text style={[styles.text]}>Total drinks: {adventure.drink_count}</Text>
           <Text style={[styles.text]}>Duration: {durations.days} days, {durations.hours} hours, {durations.minutes} minutes and {durations.seconds} seconds</Text>
           <Text style={[styles.text]}>Distance travelled: {travelledDistance.toFixed(2)} km</Text>
-		    <Image source={require('../../res/assets/images/drunk_owl.png')} style={[globalStyles.centerVertical, globalStyles.centerHorizontal,{width: 200, height: 200}]} />
+          <Image source={require('../../res/assets/images/drunk_owl.png')} style={[globalStyles.centerVertical, globalStyles.centerHorizontal, {width: 200, height: 200}]} />
           <Button onPress={() => this.handleDelete()} style={[styles.deleteButton, globalStyles.centerVertical, globalStyles.centerHorizontal]}>
             <Text>Forget plz..</Text>
           </Button>

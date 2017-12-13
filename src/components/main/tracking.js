@@ -12,6 +12,7 @@ import moment from 'moment';
 import {getCurrentPosition} from '../../services/geolocation';
 
 import {styles as globalStyles} from '../../res/styles';
+import {getDistanceInKmBetweenCoordinates} from '../../helpers/location';
 
 const getCurrentAdventureByKey = (adventureKey) => {
   return new Promise((resolve, reject) => {
@@ -267,6 +268,16 @@ export default class Tracking extends Component {
       </Container>
     )
 
+    let travelledDistance = 0;
+    if (!!adventure && !!adventure.locations && adventure.locations.length) {
+      adventure.locations.map((location, index) => {
+        const previousValue = adventure.locations[index - 1];
+        const currentValue = location;
+        const distanceBetweenPrevious = getDistanceInKmBetweenCoordinates(previousValue, currentValue);
+        travelledDistance = travelledDistance + distanceBetweenPrevious;
+      })
+    }
+
     return (
       <Container style={globalStyles.centerContent}>
        <H1>Bar Adventure</H1>
@@ -276,7 +287,7 @@ export default class Tracking extends Component {
           Current drink count: {!!adventure ? adventure.drink_count : 0}
         </Text>
       <Text style={[globalStyles.textPrimary, {marginBottom: 50}]}>
-          Travelled distance:
+          Travelled distance: {travelledDistance.toFixed(2)} km
         </Text>
 
         <Button style={[globalStyles.verticalMargin, globalStyles.centerHorizontal]} onPress={this.handleDrinkButtonClick}>
