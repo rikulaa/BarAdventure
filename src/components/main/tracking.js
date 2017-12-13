@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Container from '../container';
-import {Text, Button, H1} from 'native-base';
+import {Text, Button, H1, Spinner} from 'native-base';
 
 
 import {DeviceEventEmitter, Alert, Image} from 'react-native';
@@ -11,7 +11,7 @@ import moment from 'moment';
 
 import {getCurrentPosition} from '../../services/geolocation';
 
-import {styles} from '../../res/styles';
+import {styles as globalStyles} from '../../res/styles';
 
 const getCurrentAdventureByKey = (adventureKey) => {
   return new Promise((resolve, reject) => {
@@ -20,6 +20,25 @@ const getCurrentAdventureByKey = (adventureKey) => {
     })
   })
 }
+const fetchPreviousAdventure = (uid) => {
+  return new Promise((resolve, reject) => {
+    firebase.database().ref(DB_NAMES.adventures)
+      .orderByChild("userUid")
+      .equalTo(uid)
+      .limitToLast(1)
+      .once('value').then((snapshot) => {
+        const adventures = !!snapshot.val() ? Object.keys(snapshot.val()).map((id, index) => {
+          return snapshot.val()[id];
+        }) : []
+       const lastAdventure = !!adventures ? adventures[0] : {};
+       resolve(lastAdventure);
+      }).catch(er => {
+        console.log(er);
+      });
+  });
+};
+
+
 
 const createNewAdventure = () => {
     return firebase.database().ref(DB_NAMES.adventures).push().key;
@@ -30,6 +49,7 @@ export default class Tracking extends Component {
     super(props);
 
     this.state = {
+      loading: false,
       error: null,
       adventureKey: null,
       adventure: null,
@@ -42,12 +62,31 @@ export default class Tracking extends Component {
     this.handleDrinkButtonClick = this.handleDrinkButtonClick.bind(this);
     this.handleAlert = this.handleAlert.bind(this);
     this.alertCheck = this.alertCheck.bind(this);
+    this.checkUncompleteAdventure = this.checkUncompleteAdventure.bind(this);
   }
 
   componentDidMount() {
-    this.setState({user: firebase.auth().currentUser});
+    const currentUser = firebase.auth().currentUser;
+    this.setState({user: currentUser});
+    this.checkUncompleteAdventure(currentUser.uid);
   }
 
+  checkUncompleteAdventure(uid) {
+    this.setState({loading: true});
+    const getPreviousAdventure = fetchPreviousAdventure(uid);
+    getPreviousAdventure.then(adventure => {
+      console.log(adventure, 'fetced previous');
+      if (!!adventure && !adventure.completed) {
+        console.log('previous adventure was not completed');
+        this.setState({adventure, adventureKey: adventure.id, loading: false});
+      } else {
+        this.setState({loading: false});
+      }
+    }).catch(er => {
+      console.log('error fetching previous adventure');
+      this.setState({loading: false});
+    });
+  }
 
   handleDrinkButtonClick() {
       if (this.state.adventureKey) {
@@ -220,24 +259,30 @@ export default class Tracking extends Component {
 
   render() {
     console.log(this.state, 'this.state');
-    const {adventure} = this.state;
+    const {adventure, loading} = this.state;
+
+    if (loading) return (
+      <Container style={[globalStyles.centerContent]}>
+        <Spinner style={[globalStyles.centerHorizontal, globalStyles.centerVertical]} />
+      </Container>
+    )
 
     return (
-      <Container style={styles.centerContent}>
+      <Container style={globalStyles.centerContent}>
        <H1>Bar Adventure</H1>
       <Image source={require('../../res/assets/images/owl.png')} style={{width: 300, height: 300}} />
 
-        <Text style={[styles.textPrimary, {marginBottom: 20}]}>
-          Current drink count: {!!adventure && adventure.drink_count}
+        <Text style={[globalStyles.textPrimary, {marginBottom: 20}]}>
+          Current drink count: {!!adventure ? adventure.drink_count : 0}
         </Text>
-      <Text style={[styles.textPrimary, {marginBottom: 50}]}>
+      <Text style={[globalStyles.textPrimary, {marginBottom: 50}]}>
           Travelled distance:
         </Text>
 
-        <Button style={[styles.verticalMargin, styles.centerHorizontal]} onPress={this.handleDrinkButtonClick}>
+        <Button style={[globalStyles.verticalMargin, globalStyles.centerHorizontal]} onPress={this.handleDrinkButtonClick}>
           <Text>Drink!</Text>
         </Button>
-         <Button danger style={[styles.verticalMargin, styles.centerHorizontal]} onPress={this.endAdventure}>
+         <Button danger style={[globalStyles.verticalMargin, globalStyles.centerHorizontal]} onPress={this.endAdventure}>
           <Text>I'm done..</Text>
         </Button>
       </Container >
