@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-
+import {View} from 'react-native';
 import {Root, Spinner} from 'native-base';
 
 // navigator (routes)
 import {LoggedInRoutes, LoggedOutRoutes} from './navigators';
 
 import firebase from './services/firebase';
+import {styles as globalStyles} from './res/styles/';
 
 export default class App extends Component {
   constructor(props) {
@@ -47,7 +48,9 @@ export default class App extends Component {
     const {user} = this.state;
     return (
       <Root>
-        {isLoading && <Spinner />}
+        {isLoading && <View style={[globalStyles.centerContent]}>
+          <Spinner style={[globalStyles.centerHorizontal, globalStyles.centerVertical]} />
+        </View>}
         {isLoggedIn && !isLoading && <LoggedInRoutes screenProps={{user}} />}
         {!isLoggedIn && !isLoading && <LoggedOutRoutes />}
       </Root>

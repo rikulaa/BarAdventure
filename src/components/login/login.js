@@ -3,7 +3,7 @@ import {StyleSheet} from 'react-native';
 import Container from '../container';
 import {Alert} from 'react-native';
 import {Content,  Item, Form, Input, Text, Button, Spinner} from 'native-base';
-import {styles} from '../../res/styles';
+import {styles as globalStyles} from '../../res/styles';
 
 import firebase from '../../services/firebase';
 
@@ -59,10 +59,14 @@ export default class Login extends Component {
     const {email, password, isLoading} = this.state;
     console.log('this', this.state);
 
-    if (isLoading) return <Spinner />
+    if (isLoading) return (
+      <Container style={[globalStyles.centerContent]}>
+        <Spinner style={[globalStyles.centerHorizontal, globalStyles.centerVertical]} />
+      </Container>
+    );
 
     return (
-      <Container style={[localStyles.container, styles.centerHorizontal]}>
+      <Container style={[localStyles.container, globalStyles.centerHorizontal]}>
         <Form style={[localStyles.form]}>
           <Item error={validate(email.value, 'email') && email.touched}>
             <Input onChangeText={(email) => this.setState({email: {value: email, touched: true}})} placeholder="Email" />
@@ -73,13 +77,13 @@ export default class Login extends Component {
 
         </Form>
 
-        <Button style={[styles.centerHorizontal, localStyles.button]} onPress={this.handleLogin.bind(this)}>
+        <Button style={[globalStyles.centerHorizontal, localStyles.button]} onPress={this.handleLogin.bind(this)}>
           <Text>
             Login
             </Text>
         </Button>
 
-        <Button style={[styles.centerHorizontal, localStyles.button, styles.bgTransparent]} onPress={() => navigation.navigate('Register')}>
+        <Button style={[globalStyles.centerHorizontal, localStyles.button, globalStyles.bgTransparent]} onPress={() => navigation.navigate('Register')}>
           <Text style={[{color: 'blue'}]}>Register</Text>
         </Button>
 
