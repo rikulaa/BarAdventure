@@ -1,9 +1,12 @@
 import React, {Component} from 'react';
 import Container from '../container';
-import {View, Image, StyleSheet} from 'react-native';
+import {View, Image, StyleSheet, Alert} from 'react-native';
 import moment from 'moment';
 import {Text, List, ListItem, Left, Icon, Right, Body, Spinner, Button} from 'native-base';
+import {NavigationActions} from 'react-navigation'
 import {GOOGLE_STATIC_MAPS_API_KEY} from '../../../env';
+
+import {styles as globalStyles} from '../../res/styles';
 
 import {getDurationBetweenDates} from '../../helpers/time';
 import firebase, {DB_NAMES} from '../../services/firebase';
@@ -23,7 +26,7 @@ export default class SummaryDetail extends Component {
     this.handleDelete = this.handleDelete.bind(this);
   }
   componentDidMount() {
-    console.log(this.props, 'props');
+    console.log(this.props, 'props in summary detail');
     // get the adventure from navigation params
     const adventure = this.props.navigation.state.params;
     const locations = !!adventure ? adventure.locations : [];
@@ -38,21 +41,29 @@ export default class SummaryDetail extends Component {
       console.log(markerLocations, 'lcscscs');
     });
 
-
-
     markerString = markerString + markerLocations;
-    console.log(markerString, 'maerkerStrint');
-
-
     const mapUrl = GOOGLE_MAPS_PREFIX + markerString + paths + '&key=' + GOOGLE_STATIC_MAPS_API_KEY;
-
     this.setState({adventure, mapUrl, loading: false});
-
   }
 
   handleDelete() {
-    const {adventure} = this.state;
-    console.log(adventure, 'avd');
+    const {adventure: {id, userUid}} = this.state;
+    const {navigation} = this.props;
+    let updates = {};
+    updates[id] = null;
+    Alert.alert('Forget?', 'Do you really wish to forget this one?', [
+      {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+      {
+        text: 'Yes, I want to forget', onPress: () => {
+          updates[DB_NAMES.users + '/' + userUid + '/adventures/' + id] = null
+          firebase.database().ref(DB_NAMES.adventures).update(updates);
+          navigation.dispatch(
+            NavigationActions.reset(
+              {index: 0, actions: [NavigationActions.navigate({routeName: 'Summary'})]}
+            )
+          );
+        }
+      }], {cancelable: false})
   }
 
 
@@ -76,7 +87,8 @@ export default class SummaryDetail extends Component {
           <Text style={[styles.text]}>Total drinks: {adventure.drink_count}</Text>
           <Text style={[styles.text]}>Duration of your adventure: {durations.days} days, {durations.hours} hours, {durations.minutes} minutes and {durations.seconds} seconds</Text>
           <Image source={require('../../res/assets/images/drunk_owl.png')} style={{width: 200, height: 200}} />
-          <Button onPress={() => this.handleDelete()} style={[styles.deleteButton]}>
+          <Button onPress={() => this.handleDelete()} style={[styles.deleteButton, globalStyles.centerVertical, globalStyles.centerHorizontal]}>
+
             <Text>Forget plz..</Text>
           </Button>
         </View>

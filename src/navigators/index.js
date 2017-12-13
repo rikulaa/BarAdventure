@@ -10,12 +10,6 @@ import SummaryDetailScreen from '../screens/summary/summary-detail-screen';
 import TestScreen from '../screens/test/test';
 import SettingsScreen from '../screens/settings/settings-screen';
 
-// const headerLeft = navigation => (
-//   <Button transparent onPress={_ => navigation.navigate('DrawerOpen')}>
-//       <Icon ios="ios-menu" android="md-menu" style={{color: '#fff'}} />
-//   </Button>
-// );
-
 const contentOptions = {
   initialRouteName: 'Main',
   drawerPosition: 'left'
@@ -26,13 +20,12 @@ const SummaryRoutes = StackNavigator({
   Summary: {
     screen: SummaryScreen,
     navigationOptions: {
-      title: 'Adventures'
+      title: 'Drink diary'
     }
   },
   SummaryDetail: {
     screen: SummaryDetailScreen,
     navigationOptions: {
-      title: 'Adventures'
     }
   }
 })

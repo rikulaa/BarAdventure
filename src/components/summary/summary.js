@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import moment from 'moment';
 import Container from '../container';
 import {View} from 'react-native';
-import {Text, List, ListItem, Left, Icon, Right, Body, Spinner} from 'native-base';
+import {Text, List, ListItem, Left, Icon, Right, Body, Spinner, Button} from 'native-base';
 
 import firebase, {DB_NAMES} from '../../services/firebase';
+import {styles} from '../../res/styles';
 
 const fetchAdventuresFromFirebase = (uid, limit) => {
   return new Promise((resolve, reject) => {
@@ -13,11 +14,13 @@ const fetchAdventuresFromFirebase = (uid, limit) => {
     .equalTo(uid)
     .limitToLast(limit)
     .once('value').then((snapshot) => {
-      const adventures = Object.keys(snapshot.val()).map((id, index) => {
+      const adventures = !!snapshot.val() ? Object.keys(snapshot.val()).map((id, index) => {
         return snapshot.val()[id];
-      }).reverse();
+      }).reverse() : [];
 
       resolve(adventures);
+    }).catch(er => {
+      console.log(er);
     });
   });
 };
@@ -49,6 +52,8 @@ export default class Summary extends Component {
 
     getAdventures.then((adventures) => {
       this.setState({loading: false, adventures});
+    }).catch(er => {
+      this.setState({loading: false});
     })
   }
 
@@ -73,7 +78,7 @@ export default class Summary extends Component {
     return (
       <View>
         <List style={{backgroundColor: '#fff'}} onTouchEndCapture={(event) => this.handleScrollEnd(event)}>
-          {!!adventures && adventures.map((adventure, index) =>
+          {!!adventures && !!adventures.length && adventures.map((adventure, index) =>
             <ListItem onPress={() => navigate('SummaryDetail', adventure)} key={index} icon>
               <Body>
                 <Text>{date(adventure.start_time)}</Text>
@@ -85,6 +90,11 @@ export default class Summary extends Component {
         </List>
 
         {this.state.loading && <Spinner color='green' />}
+        {adventures.length === 0 &&
+          <View>
+            <Text style={[styles.centerHorizontal, styles.centerVertical, {marginTop: 50}]}>No adventures available.</Text>
+            <Button onPress={() => navigate('Main')} style={[styles.centerHorizontal, styles.centerVertical, {marginTop: 20}]} bordered><Text>Start new</Text></Button>
+          </View>}
       </View>
     );
   }
